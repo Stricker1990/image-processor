@@ -4,9 +4,15 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>94ed173f-78c9-44cd-b33c-a47e28a8172e</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Data.Tables" Version="12.9.1" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.23.0" />
+    <PackageReference Include="Azure.Storage.Files.Shares" Version="12.20.1" />
+    <PackageReference Include="Azure.Storage.Queues" Version="12.20.1" />
+    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.6" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 

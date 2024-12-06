@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using ImageProcessor.Services;
 
 namespace ImageProcessor.Controllers
 {
@@ -7,10 +9,18 @@ namespace ImageProcessor.Controllers
     [Route("files")]
     public class FileController : ControllerBase
     {
-        [HttpPost]
-        public IActionResult Index()
+        private IFileService _fileService;
+        public FileController(IFileService fileService)
         {
-            return Ok();
+            _fileService = fileService;
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> Index(IFormFile file)
+        {
+            var fileName = await _fileService.UploadFile(file);
+            return Ok(fileName);
         }
     }
 }
