@@ -1,21 +1,22 @@
 ﻿using Azure.Storage.Blobs;
+using ImageProcessor.Domain.Interfaces;
 
 namespace ImageProcessor.Services
 {
-    public class FileService : IFileService
+    public class FileSorageService : IFileStorageService
     {
         private static readonly string CONNECTION_STRING = "UseDevelopmentStorage=true";
         private static readonly string CONTAINER_NAME = "files-container";
 
         private readonly BlobContainerClient _blobClient;
 
-        public FileService()
+        public FileSorageService()
         {
             _blobClient = new BlobContainerClient(CONNECTION_STRING, CONTAINER_NAME);
         }
         public async Task<string> UploadFile(IFormFile file)
         {
-            var fileName = Guid.NewGuid().ToString();
+            var fileName = $"uploaded/{Guid.NewGuid().ToString()}_{file.FileName}";
             await _blobClient.CreateIfNotExistsAsync();
 
             var stream = file.OpenReadStream();

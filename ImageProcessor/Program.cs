@@ -1,3 +1,4 @@
+using ImageProcessor.Domain.Interfaces;
 using ImageProcessor.Services;
 using Microsoft.Extensions.Azure;
 
@@ -19,7 +20,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<IFileService, FileService>();
+builder.Services.AddSingleton<IFileStorageService, FileSorageService>();
+builder.Services.AddSingleton<ITaskService, TaskService>();
 builder.Services.AddAzureClients(clientBuilder =>
 {
     clientBuilder.AddBlobServiceClient(builder.Configuration["StorageConnection:blobServiceUri"]!).WithName("StorageConnection");

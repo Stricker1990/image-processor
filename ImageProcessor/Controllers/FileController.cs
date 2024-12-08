@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
-using ImageProcessor.Services;
+using ImageProcessor.Domain.Interfaces;
 
 namespace ImageProcessor.Controllers
 {
@@ -9,18 +7,21 @@ namespace ImageProcessor.Controllers
     [Route("files")]
     public class FileController : ControllerBase
     {
-        private IFileService _fileService;
-        public FileController(IFileService fileService)
+        private IFileStorageService _fileService;
+        private ITaskService _taskService;
+        public FileController(IFileStorageService fileService, ITaskService taskService)
         {
             _fileService = fileService;
+            _taskService = taskService;
         }
 
 
         [HttpPost]
         public async Task<IActionResult> Index(IFormFile file)
         {
-            var fileName = await _fileService.UploadFile(file);
-            return Ok(fileName);
+            var storagePath = await _fileService.UploadFile(file);
+            var task = await _taskService.CreateTaskAsync(file.FileName, storagePath);
+            return Ok(storagePath);
         }
     }
 }
