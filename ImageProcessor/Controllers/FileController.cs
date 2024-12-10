@@ -19,9 +19,10 @@ namespace ImageProcessor.Controllers
         [HttpPost]
         public async Task<IActionResult> Index(IFormFile file)
         {
-            var storagePath = await _fileService.UploadFile(file);
-            var task = await _taskService.CreateTaskAsync(file.FileName, storagePath);
-            return Ok(storagePath);
+            var id = Guid.NewGuid().ToString();
+            var storagePath = await _fileService.UploadFile(file, id);
+            var task = await _taskService.CreateTaskAsync(id, file.FileName, storagePath);
+            return Ok(task.id);
         }
     }
 }

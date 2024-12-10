@@ -14,9 +14,9 @@ namespace ImageProcessor.Services
         {
             _blobClient = new BlobContainerClient(CONNECTION_STRING, CONTAINER_NAME);
         }
-        public async Task<string> UploadFile(IFormFile file)
+        public async Task<string> UploadFile(IFormFile file, string id)
         {
-            var fileName = $"uploaded/{Guid.NewGuid().ToString()}_{file.FileName}";
+            var fileName = $"uploaded/{id}_{file.FileName}";
             await _blobClient.CreateIfNotExistsAsync();
 
             var stream = file.OpenReadStream();

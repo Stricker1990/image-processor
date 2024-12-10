@@ -2,6 +2,6 @@
 {
     public interface IFileStorageService
     {
-        public Task<string> UploadFile(IFormFile file);
+        public Task<string> UploadFile(IFormFile file, string id);
     }
 }

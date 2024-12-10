@@ -1,47 +1,43 @@
 ﻿using Azure;
-using Azure.Data.Tables;
+using Microsoft.Azure.Cosmos;
 using ImageProcessor.Domain.Interfaces;
 using ImageProcessor.Domain.Entity;
 
 namespace ImageProcessor.Services
 {
-    public record TaskTableEntity : TaskEntity, ITableEntity
-    {
-        public required string PartitionKey { get; set; }
-        public string RowKey { get => Id; set => Id = value; }
-        public DateTimeOffset? Timestamp { get; set; }
-        public ETag ETag { get; set; }
-    };
     public class TaskService : ITaskService
     {
-        private static readonly string TABLE_CONNECTION_STRING = "DefaultEndpointsProtocol=http;AccountName=localhost;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==;TableEndpoint=http://localhost:8902/;";
-        private static readonly string TABLE_NAME_TASKS = "tasks";
+        private static readonly string ACCOUNT_ENDPOINT = "https://localhost:8081/";
+        private static readonly string AUTH_TOKEN = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
 
-        private readonly TableServiceClient _tableServiceClient;
-        private readonly TableClient _tableClient;
+        private readonly CosmosClient _cosmosClient;
 
         public TaskService()
         {
-            _tableServiceClient = new TableServiceClient(
-                connectionString: TABLE_CONNECTION_STRING
+            _cosmosClient = new(
+                accountEndpoint: ACCOUNT_ENDPOINT,
+                authKeyOrResourceToken: AUTH_TOKEN
             );
-            _tableClient = _tableServiceClient.GetTableClient(tableName: TABLE_NAME_TASKS);
         }
-        public async Task<TaskEntity> CreateTaskAsync(string fileName, string originalStoragePath)
+        public async Task<TaskEntity> CreateTaskAsync(string id, string fileName, string originalStoragePath)
         {
-            
-            TaskTableEntity task = new()
-            {
-                Id = Guid.NewGuid().ToString(),
-                PartitionKey = "",
+            Database database = await _cosmosClient.CreateDatabaseIfNotExistsAsync(
+                id: "image-processor-db",
+                throughput: 400
+            );
+
+            Container container = await database.CreateContainerIfNotExistsAsync(
+                id: "tasks",
+                partitionKeyPath: "/id"
+            );
+
+            TaskEntity task = new() {
+                id = id,
                 FileName = fileName,
                 InitialFilePath = originalStoragePath,
-                State = TaskState.Created
+                State = TaskState.Created,
             };
-            await _tableClient.UpsertEntityAsync(
-                entity: task,
-                mode: TableUpdateMode.Replace
-            );
+            await container.UpsertItemAsync(task);
             return task;
         }
 
