@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ImageProcessor.Domain.Interfaces;
+using ImageProcessor.DTO;
 
 namespace ImageProcessor.Controllers
 {
@@ -17,12 +18,26 @@ namespace ImageProcessor.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Index(IFormFile file)
+        public async Task<IActionResult> UploadFile(IFormFile file)
         {
             var id = Guid.NewGuid().ToString();
             var storagePath = await _fileService.UploadFile(file, id);
             var task = await _taskService.CreateTaskAsync(id, file.FileName, storagePath);
             return Ok(task.id);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetTaskState(string taskId)
+        {
+            var task = await _taskService.GetTaskAsync(taskId);
+            TaskStateDTO result = new()
+            {
+                State = task.State,
+                FileName = task.FileName,
+                FileURL = ""
+
+            };
+            return Ok(result);
         }
     }
 }
