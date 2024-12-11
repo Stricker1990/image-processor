@@ -3,6 +3,6 @@
     public interface IFileStorageService
     {
         public Task<string> UploadFile(IFormFile file, string id);
-        public Task<string> GetURLAsync(string filePath);
+        public string GetURL(string filePath);
     }
 }

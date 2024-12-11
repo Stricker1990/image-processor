@@ -26,7 +26,7 @@ namespace ImageProcessor.Services
             return fileName;
         }
 
-        public async Task<string> GetURLAsync(string filePath)
+        public string GetURL(string filePath)
         {
             if (String.IsNullOrWhiteSpace(filePath))
             {
