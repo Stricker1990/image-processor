@@ -30,11 +30,12 @@ namespace ImageProcessor.Controllers
         public async Task<IActionResult> GetTaskState(string taskId)
         {
             var task = await _taskService.GetTaskAsync(taskId);
+            var fileURL = await _fileService.GetURLAsync(task.ProcessedFilePath);
             TaskStateDTO result = new()
             {
                 State = task.State,
                 FileName = task.FileName,
-                FileURL = ""
+                FileURL = fileURL
 
             };
             return Ok(result);

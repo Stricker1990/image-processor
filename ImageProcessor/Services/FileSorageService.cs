@@ -14,6 +14,7 @@ namespace ImageProcessor.Services
         {
             _blobClient = new BlobContainerClient(CONNECTION_STRING, CONTAINER_NAME);
         }
+
         public async Task<string> UploadFile(IFormFile file, string id)
         {
             var fileName = $"uploaded/{id}_{file.FileName}";
@@ -23,6 +24,15 @@ namespace ImageProcessor.Services
             await _blobClient.UploadBlobAsync(fileName, stream);
 
             return fileName;
+        }
+
+        public async Task<string> GetURLAsync(string filePath)
+        {
+            if (String.IsNullOrWhiteSpace(filePath))
+            {
+                return "";
+            }
+            return new Uri(_blobClient.Uri, filePath).ToString(); ;
         }
     }
 }
