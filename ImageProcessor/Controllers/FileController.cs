@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ImageProcessor.Domain.Interfaces;
 using ImageProcessor.DTO;
+using System.Threading.Tasks;
 
 namespace ImageProcessor.Controllers
 {
@@ -10,10 +11,12 @@ namespace ImageProcessor.Controllers
     {
         private IFileStorageService _fileService;
         private ITaskService _taskService;
-        public FileController(IFileStorageService fileService, ITaskService taskService)
+        private IMessagesService _messagesService;
+        public FileController(IFileStorageService fileService, ITaskService taskService, IMessagesService messageService)
         {
             _fileService = fileService;
             _taskService = taskService;
+            _messagesService = messageService;
         }
 
 
@@ -23,6 +26,7 @@ namespace ImageProcessor.Controllers
             var id = Guid.NewGuid().ToString();
             var storagePath = await _fileService.UploadFile(file, id);
             var task = await _taskService.CreateTaskAsync(id, file.FileName, storagePath);
+            await _messagesService.PublishMessage(id);
             return Ok(task.id);
         }
 

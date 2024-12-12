@@ -22,6 +22,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IFileStorageService, FileSorageService>();
 builder.Services.AddSingleton<ITaskService, TaskService>();
+builder.Services.AddSingleton<IMessagesService, MessageService>();
 builder.Services.AddAzureClients(clientBuilder =>
 {
     clientBuilder.AddBlobServiceClient(builder.Configuration["StorageConnection:blobServiceUri"]!).WithName("StorageConnection");
