@@ -5,14 +5,13 @@ namespace ImageProcessor.Services
 {
     public class FileSorageService : IFileStorageService
     {
-        private static readonly string CONNECTION_STRING = "UseDevelopmentStorage=true";
         private static readonly string CONTAINER_NAME = "files-container";
 
         private readonly BlobContainerClient _blobClient;
 
-        public FileSorageService()
+        public FileSorageService(IConfiguration config)
         {
-            _blobClient = new BlobContainerClient(CONNECTION_STRING, CONTAINER_NAME);
+            _blobClient = new BlobContainerClient(config.GetConnectionString("BlobStorage"), CONTAINER_NAME);
         }
 
         public async Task<string> UploadFile(IFormFile file, string id)

@@ -11,20 +11,17 @@ namespace ImageProcessor.Services
     }
     public class TaskService : ITaskService
     {
-        private static readonly string ACCOUNT_ENDPOINT = "https://localhost:8081/";
-        private static readonly string AUTH_TOKEN = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
-
         private static readonly string DB_ID = "image-processor-db";
         private static readonly string CONTAINER_ID = "tasks";
         private static readonly string PARTITION_KEY = "staticPartitionKey";
 
         private readonly CosmosClient _cosmosClient;
 
-        public TaskService()
+        public TaskService(IConfiguration config)
         {
             _cosmosClient = new(
-                accountEndpoint: ACCOUNT_ENDPOINT,
-                authKeyOrResourceToken: AUTH_TOKEN
+                accountEndpoint: config.GetValue<string>("CosmosDB:EndPoint"),
+                authKeyOrResourceToken: config.GetValue<string>("CosmosDB:AuthToken")
             );
         }
         public async Task<TaskEntity> CreateTaskAsync(string id, string fileName, string originalStoragePath)
