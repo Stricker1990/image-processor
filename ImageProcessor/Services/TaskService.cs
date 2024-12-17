@@ -1,5 +1,4 @@
-﻿using Azure;
-using Microsoft.Azure.Cosmos;
+﻿using Microsoft.Azure.Cosmos;
 using ImageProcessor.Domain.Interfaces;
 using ImageProcessor.Domain.Entity;
 
@@ -47,11 +46,6 @@ namespace ImageProcessor.Services
             return task;
         }
 
-        public TaskEntity FinishProcessingTask(string id, string processedStoragePath)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<TaskEntity?> GetTaskAsync(string id)
         {
             var container = _cosmosClient.GetDatabase(DB_ID)?.GetContainer(CONTAINER_ID);
@@ -62,9 +56,19 @@ namespace ImageProcessor.Services
             return await container.ReadItemAsync<TaskEntity>(id, new PartitionKey(PARTITION_KEY));
         }
 
-        public Task<TaskEntity> StartProcessingTaskAsync(string id)
+        public async Task<TaskEntity> UpdateTaskAsync(TaskEntity taskEntity)
         {
-            throw new NotImplementedException();
+            var container = _cosmosClient.GetDatabase(DB_ID)?.GetContainer(CONTAINER_ID);
+            TaskEntityCosmosDB task = new()
+            {
+                id = taskEntity.id,
+                FileName = taskEntity.FileName,
+                InitialFilePath = taskEntity.InitialFilePath,
+                ProcessedFilePath = taskEntity.ProcessedFilePath,
+                State = taskEntity.State,
+                partitionKey = PARTITION_KEY
+            };
+            return await container?.UpsertItemAsync(task);
         }
     }
 }

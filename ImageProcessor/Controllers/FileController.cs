@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ImageProcessor.Domain.Interfaces;
 using ImageProcessor.DTO;
-using System.Threading.Tasks;
+using ImageProcessor.Domain.Entity;
 
 namespace ImageProcessor.Controllers
 {
@@ -43,6 +43,27 @@ namespace ImageProcessor.Controllers
 
             };
             return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("/process")]
+        public async Task<IActionResult> ProcessImage(string taskId)
+        {
+            var task = await _taskService.GetTaskAsync(taskId);
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            task = task with { State = TaskState.InProgress};
+            task = await _taskService.UpdateTaskAsync(task);
+
+            var processedFile = await _fileService.RotateFile(task);
+
+            task = task with { State = TaskState.Done, ProcessedFilePath = processedFile };
+            task = await _taskService.UpdateTaskAsync(task);
+
+            return Ok();
         }
     }
 }
