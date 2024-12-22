@@ -1,0 +1,6 @@
+services:
+  imageprocessor:
+    image: ${DOCKER_REGISTRY-}imageprocessor
+    build:
+      context: .
+      dockerfile: ImageProcessor/Dockerfile
