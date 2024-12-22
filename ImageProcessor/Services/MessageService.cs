@@ -1,6 +1,7 @@
 ﻿using ImageProcessor.Domain.Interfaces;
 
 using Azure.Messaging.ServiceBus;
+using System.Text.Json;
 
 namespace ImageProcessor.Services
 {
@@ -16,9 +17,15 @@ namespace ImageProcessor.Services
             _serviceBusSender = _serviceBusClient.CreateSender(TOPIC_NAME);
         }
         
-        public async Task PublishMessage(string message)
+        public async Task PublishMessage(Message messageBody)
         {
-            await _serviceBusSender.SendMessageAsync(new ServiceBusMessage(message));
+            var jsonMessage = JsonSerializer.Serialize(messageBody);
+
+            var message = new ServiceBusMessage(jsonMessage)
+            {
+                ContentType = "application/json"
+            };
+            await _serviceBusSender.SendMessageAsync(message);
         }
     }
 }

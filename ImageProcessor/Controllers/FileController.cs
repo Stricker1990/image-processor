@@ -26,7 +26,7 @@ namespace ImageProcessor.Controllers
             var id = Guid.NewGuid().ToString();
             var storagePath = await _fileService.UploadFile(file, id);
             var task = await _taskService.CreateTaskAsync(id, file.FileName, storagePath);
-            await _messagesService.PublishMessage(id);
+            await _messagesService.PublishMessage(new Message() { Id = id, BlobName = storagePath});
             return Ok(task.id);
         }
 
