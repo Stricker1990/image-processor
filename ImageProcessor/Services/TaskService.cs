@@ -2,6 +2,10 @@
 using ImageProcessor.Domain.Interfaces;
 using ImageProcessor.Domain.Entity;
 
+using Azure.Identity;
+using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
+using Azure.Core;
+
 namespace ImageProcessor.Services
 {
     public record TaskEntityCosmosDB : TaskEntity
@@ -16,12 +20,25 @@ namespace ImageProcessor.Services
 
         private readonly CosmosClient _cosmosClient;
 
-        public TaskService(IConfiguration config)
+        public TaskService(IConfiguration config, IWebHostEnvironment hostEnvironment)
         {
-            _cosmosClient = new(
-                accountEndpoint: config.GetValue<string>("CosmosDB:EndPoint"),
-                authKeyOrResourceToken: config.GetValue<string>("CosmosDB:AuthToken")
-            );
+            var accountEndpoint = config.GetValue<string>("AZURE_COSMOS_RESOURCEENDPOINT");
+            var credential = new DefaultAzureCredential(); ;
+            if (hostEnvironment.IsDevelopment())
+            {
+                _cosmosClient = new(
+                    accountEndpoint,
+                    authKeyOrResourceToken: config.GetValue<string>("CosmosDB:AuthToken")
+                );
+            }
+            else
+            {
+                _cosmosClient = new(
+                    accountEndpoint,
+                    tokenCredential: credential
+                );
+            }
+            
         }
         public async Task<TaskEntity> CreateTaskAsync(string id, string fileName, string originalStoragePath)
         {

@@ -5,7 +5,6 @@ using ImageProcessor.Domain.Interfaces;
 using ImageProcessor.Domain.Entity;
 
 using Azure.Identity;
-using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
 
 namespace ImageProcessor.Services
 {
