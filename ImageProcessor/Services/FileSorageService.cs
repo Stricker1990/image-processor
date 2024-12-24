@@ -3,7 +3,9 @@ using System.Drawing;
 using Azure.Storage.Blobs;
 using ImageProcessor.Domain.Interfaces;
 using ImageProcessor.Domain.Entity;
-using System.IO;
+
+using Azure.Identity;
+using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
 
 namespace ImageProcessor.Services
 {
@@ -13,9 +15,18 @@ namespace ImageProcessor.Services
 
         private readonly BlobContainerClient _blobClient;
 
-        public FileSorageService(IConfiguration config)
+        public FileSorageService(IConfiguration config, IWebHostEnvironment hostEnvironment)
         {
-            _blobClient = new BlobContainerClient(config.GetConnectionString("BlobStorage"), CONTAINER_NAME);
+            var endpoint = config.GetValue<string>("AZURE_STORAGEBLOB_RESOURCEENDPOINT");
+            if(hostEnvironment.IsDevelopment())
+            {
+                _blobClient = new BlobContainerClient(endpoint, CONTAINER_NAME);
+            }
+            else
+            {
+                _blobClient = new BlobContainerClient(new Uri(endpoint), new DefaultAzureCredential());
+            }
+            
         }
 
         public async Task<string> UploadFile(IFormFile file, string id)
