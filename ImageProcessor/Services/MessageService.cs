@@ -3,6 +3,8 @@
 using Azure.Messaging.ServiceBus;
 using System.Text.Json;
 
+using Azure.Identity;
+
 namespace ImageProcessor.Services
 {
     public class MessageService : IMessagesService
@@ -11,9 +13,17 @@ namespace ImageProcessor.Services
         
         private ServiceBusClient _serviceBusClient;
         private ServiceBusSender _serviceBusSender;
-        public MessageService(IConfiguration config)
+        public MessageService(IConfiguration config, IWebHostEnvironment hostEnvironment)
         {
-            _serviceBusClient = new ServiceBusClient(config.GetConnectionString("BusService"));
+            if (hostEnvironment.IsDevelopment())
+            {
+                _serviceBusClient = new ServiceBusClient(config.GetValue<string>("AZURE_SERVICEBUS_FULLYQUALIFIEDNAMESPACE"));
+            }
+            else
+            {
+                _serviceBusClient = new ServiceBusClient(config.GetValue<string>("AZURE_SERVICEBUS_FULLYQUALIFIEDNAMESPACE"), new DefaultAzureCredential());
+            }
+            
             _serviceBusSender = _serviceBusClient.CreateSender(TOPIC_NAME);
         }
         

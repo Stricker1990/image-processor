@@ -1,7 +1,7 @@
 services:
   imageprocessor:
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Release
       - ASPNETCORE_HTTP_PORTS=5154
       - ASPNETCORE_HTTPS_PORTS=7066
     ports:
