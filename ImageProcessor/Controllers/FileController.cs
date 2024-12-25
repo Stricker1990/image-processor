@@ -65,5 +65,21 @@ namespace ImageProcessor.Controllers
 
             return Ok();
         }
+
+        [HttpPost]
+        [Route("/error")]
+        public async Task<IActionResult> SetErrorState(string taskId)
+        {
+            var task = await _taskService.GetTaskAsync(taskId);
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            task = task with { State = TaskState.Error };
+            await _taskService.UpdateTaskAsync(task);
+
+            return Ok();
+        }
     }
 }
