@@ -20,6 +20,7 @@ namespace ImageProcessor.Services
             if(hostEnvironment.IsDevelopment())
             {
                 _blobClient = new BlobContainerClient(endpoint, CONTAINER_NAME);
+                _blobClient.CreateIfNotExistsAsync().Wait();
             }
             else
             {
@@ -31,7 +32,6 @@ namespace ImageProcessor.Services
         public async Task<string> UploadFile(IFormFile file, string id)
         {
             var fileName = $"uploaded/{id}_{file.FileName}";
-            await _blobClient.CreateIfNotExistsAsync();
 
             var stream = file.OpenReadStream();
             var res = await _blobClient.UploadBlobAsync(fileName, stream);
