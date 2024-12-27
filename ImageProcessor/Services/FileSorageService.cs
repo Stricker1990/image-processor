@@ -48,7 +48,7 @@ namespace ImageProcessor.Services
             {
                 return "";
             }
-            return new Uri(_blobClient.Uri, filePath).ToString(); ;
+            return new Uri(_blobClient.Uri, $"{CONTAINER_NAME}/{filePath}").ToString(); ;
         }
 
         public async Task<string> RotateFile(TaskEntity task)
