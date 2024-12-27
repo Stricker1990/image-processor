@@ -1,9 +1,13 @@
 using ImageProcessor.Domain.Interfaces;
 using ImageProcessor.Services;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.Extensions.Azure;
-using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddHttpLogging(logging => {
+    logging.LoggingFields = HttpLoggingFields.All;
+});
 
 builder.Services.AddCors(options =>
 {
@@ -33,8 +37,15 @@ builder.Services.AddAzureClients(clientBuilder =>
 
 var app = builder.Build();
 
+app.UseHttpLogging();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+else
 {
     app.UseSwagger();
     app.UseSwaggerUI();

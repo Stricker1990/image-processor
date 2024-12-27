@@ -1,10 +1,12 @@
-﻿using System.Drawing.Imaging;
-using System.Drawing;
+﻿
 using Azure.Storage.Blobs;
 using ImageProcessor.Domain.Interfaces;
 using ImageProcessor.Domain.Entity;
 
 using Azure.Identity;
+
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 namespace ImageProcessor.Services
 {
@@ -24,7 +26,8 @@ namespace ImageProcessor.Services
             }
             else
             {
-                _blobClient = new BlobContainerClient(new Uri(endpoint), new DefaultAzureCredential());
+                var blobServiceClient = new BlobServiceClient(new Uri(endpoint), new DefaultAzureCredential());
+                _blobClient = blobServiceClient.GetBlobContainerClient(CONTAINER_NAME);
             }
             
         }
@@ -58,13 +61,13 @@ namespace ImageProcessor.Services
 
             inputStream.Position = 0;
 
-            using Image image = Image.FromStream(inputStream);
-            image.RotateFlip(RotateFlipType.Rotate180FlipNone);
+            using Image image = await Image.LoadAsync(inputStream);
+            image.Mutate(x => x.RotateFlip(RotateMode.Rotate180, FlipMode.None));
 
             BlobClient newBlobClient = _blobClient.GetBlobClient(processedFileName);
 
             using MemoryStream outputStream = new MemoryStream();
-            image.Save(outputStream, ImageFormat.Jpeg);
+            await image.SaveAsJpegAsync(outputStream);
             outputStream.Position = 0;
 
             await _blobClient.UploadBlobAsync(processedFileName, outputStream);
